@@ -427,21 +427,56 @@ python_version = "<span class="s">3.11</span>"<br/><br/>
     });
   }
 
-  // before/after sliders (multiple examples)
+  // before/after sliders (multiple examples) + slow auto sweep
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   document.querySelectorAll('.ba-frame').forEach(frame => {
     const range = frame.querySelector('.ba-range');
     const after = frame.querySelector('.ba-img.after');
     const divider = frame.querySelector('.divider');
     const handle = frame.querySelector('.handle');
     if(!range || !after) return;
+
     const setSplit = (v) => {
       const pct = Math.max(0, Math.min(100, Number(v)));
       after.style.clipPath = `inset(0 0 0 ${100 - pct}%)`;
       if(divider) divider.style.left = pct + '%';
       if(handle) handle.style.left = pct + '%';
     };
-    range.addEventListener('input', e => setSplit(e.target.value));
+
+    let t0 = null, paused = false, visible = true, resumeTimer = null;
+    const pause = () => { paused = true; if(resumeTimer){ clearTimeout(resumeTimer); resumeTimer = null; } };
+    const scheduleResume = () => {
+      if(resumeTimer) clearTimeout(resumeTimer);
+      resumeTimer = setTimeout(() => { paused = false; t0 = null; }, 2600);
+    };
+
+    range.addEventListener('input', e => { pause(); setSplit(e.target.value); scheduleResume(); });
+    range.addEventListener('pointerdown', pause);
+    range.addEventListener('touchstart', pause, { passive: true });
+    range.addEventListener('pointerup', scheduleResume);
+    range.addEventListener('touchend', scheduleResume, { passive: true });
     setSplit(range.value);
+
+    if(reduceMotion) return;
+
+    // gentle sweep between ~28% and ~72% over 7s
+    const PERIOD = 7000, MID = 50, AMP = 22;
+    try {
+      new IntersectionObserver((es) => { visible = es[0].isIntersecting; }, { threshold: 0.25 }).observe(frame);
+    } catch(e) {}
+
+    const tick = (ts) => {
+      if(!paused && visible){
+        if(t0 == null) t0 = ts;
+        const v = MID + AMP * Math.sin((ts - t0) / PERIOD * Math.PI * 2);
+        range.value = v;
+        setSplit(v);
+      } else {
+        t0 = null;
+      }
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
   });
 
   // success banner if ?joined=1
