@@ -205,6 +205,7 @@
       <span>FRAMEFROG</span>
     </a>
     <nav class="nav-links">
+      <a href="#beforeafter">Before/After</a>
       <a href="#features">Features</a>
       <a href="#how">How it works</a>
       <a href="#architecture">Architecture</a>
@@ -236,34 +237,42 @@
       <span><b>Frame interpolation</b> · 60/120fps</span>
     </div>
 
-    <!-- Before / After showcase (real examples) -->
-    <div class="showcase-grid">
-      <figure class="ba">
-        <div class="ba-frame">
-          <img class="ba-img before" src="assets/before-2.jpg" alt="Before — ungraded footage" loading="eager" />
-          <img class="ba-img after" src="assets/after-2.jpg" alt="After — FrameFrog AI color grade" loading="eager" />
-          <span class="tag b">BEFORE</span>
-          <span class="tag a">AFTER</span>
-          <div class="divider"></div>
-          <div class="handle" aria-hidden="true"></div>
-          <input class="ba-range" type="range" min="0" max="100" value="50" aria-label="Before and after comparison" />
-        </div>
-        <figcaption>AI color grading · look matching &amp; tone</figcaption>
-      </figure>
-      <figure class="ba">
-        <div class="ba-frame">
-          <img class="ba-img before" src="assets/before-1.jpg" alt="Before — flat grade" loading="lazy" />
-          <img class="ba-img after" src="assets/after-1.jpg" alt="After — FrameFrog AI color grade" loading="lazy" />
-          <span class="tag b">BEFORE</span>
-          <span class="tag a">AFTER</span>
-          <div class="divider"></div>
-          <div class="handle" aria-hidden="true"></div>
-          <input class="ba-range" type="range" min="0" max="100" value="50" aria-label="Before and after comparison" />
-        </div>
-        <figcaption>AI color grading · saturation &amp; contrast restoration</figcaption>
-      </figure>
+  </section>
+
+  <!-- BEFORE / AFTER -->
+  <section id="beforeafter">
+    <div class="wrap">
+      <div class="kicker">Before / After</div>
+      <h2>See the AI grade.</h2>
+      <p class="sub">Drag a slider to compare ungraded footage with FrameFrog's AI color grading — two real examples.</p>
+      <div class="showcase-grid" style="margin-top:8px">
+        <figure class="ba">
+          <div class="ba-frame">
+            <img class="ba-img before" src="assets/before-2.jpg" alt="Before — ungraded footage" loading="eager" />
+            <img class="ba-img after" src="assets/after-2.jpg" alt="After — FrameFrog AI color grade" loading="eager" />
+            <span class="tag b">BEFORE</span>
+            <span class="tag a">AFTER</span>
+            <div class="divider"></div>
+            <div class="handle" aria-hidden="true"></div>
+            <input class="ba-range" type="range" min="0" max="100" value="50" aria-label="Before and after comparison" />
+          </div>
+          <figcaption>AI color grading · look matching &amp; tone</figcaption>
+        </figure>
+        <figure class="ba">
+          <div class="ba-frame">
+            <img class="ba-img before" src="assets/before-1.jpg" alt="Before — flat grade" loading="lazy" />
+            <img class="ba-img after" src="assets/after-1.jpg" alt="After — FrameFrog AI color grade" loading="lazy" />
+            <span class="tag b">BEFORE</span>
+            <span class="tag a">AFTER</span>
+            <div class="divider"></div>
+            <div class="handle" aria-hidden="true"></div>
+            <input class="ba-range" type="range" min="0" max="100" value="50" aria-label="Before and after comparison" />
+          </div>
+          <figcaption>AI color grading · saturation &amp; contrast restoration</figcaption>
+        </figure>
+      </div>
+      <div class="caption">Drag either slider — real before / after color grading examples</div>
     </div>
-    <div class="caption">Drag either slider — real before / after color grading examples</div>
   </section>
 
   <!-- FEATURES -->
