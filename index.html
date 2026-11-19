@@ -125,6 +125,20 @@
   .ba figcaption{text-align:center;color:var(--dim);font-size:13px;margin-top:12px}
   @media(max-width:900px){.showcase-grid{grid-template-columns:1fr}}
 
+  /* before/after — video slider */
+  .ba-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;background:#000}
+  .ba-vid.after{clip-path:inset(0 0 0 50%)}
+  .ba-video{grid-column:1/-1;margin-top:8px}
+  .ba-video .ba-frame{aspect-ratio:16/9}
+  .ba-sound{position:absolute;left:14px;bottom:14px;z-index:7;display:inline-flex;align-items:center;gap:8px;
+    padding:7px 14px;border-radius:999px;font-size:12px;font-weight:600;letter-spacing:.4px;cursor:pointer;
+    background:rgba(8,12,18,.72);border:1px solid var(--line2);color:#dfe7ef;backdrop-filter:blur(6px)}
+  .ba-sound:hover{border-color:rgba(16,185,129,.55);color:#c9ffe0}
+  .ba-sound[aria-pressed="true"]{border-color:rgba(16,185,129,.55);color:#c9ffe0}
+  .ba-video-note{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:14px;
+    color:var(--dim);font-size:13px}
+  .ba-video-note span{border:1px solid var(--line2);border-radius:999px;padding:5px 12px}
+
   /* section */
   section{padding:84px 0;position:relative}
   .kicker{color:var(--teal);font-weight:600;letter-spacing:2px;font-size:12.5px;text-transform:uppercase;text-align:center;margin-bottom:14px}
@@ -356,7 +370,7 @@
     <div class="wrap">
       <div class="kicker">Before / After</div>
       <h2>See the AI grade.</h2>
-      <p class="sub">Drag a slider to compare ungraded footage with FrameFrog's AI color grading — two real examples.</p>
+      <p class="sub">Drag a slider to compare the source with FrameFrog's AI color grading — two still examples and one 30-second video.</p>
       <div class="showcase-grid" style="margin-top:8px">
         <figure class="ba">
           <div class="ba-frame">
@@ -382,8 +396,32 @@
           </div>
           <figcaption>AI color grading · saturation &amp; contrast restoration</figcaption>
         </figure>
+
+        <figure class="ba ba-video">
+          <div class="ba-frame">
+            <video class="ba-vid before" src="assets/video/prog3-raw.mp4"
+                   poster="assets/video/prog3-poster.jpg" muted loop playsinline preload="metadata"
+                   aria-label="Source clip before grading"></video>
+            <video class="ba-vid after" src="assets/video/prog3-graded.mp4"
+                   poster="assets/video/prog3-poster.jpg" muted loop playsinline preload="metadata"
+                   aria-label="Same clip with the FrameFrog grade applied"></video>
+            <span class="tag b">SOURCE</span>
+            <span class="tag a">GRADED</span>
+            <div class="divider"></div>
+            <div class="handle" aria-hidden="true"></div>
+            <input class="ba-range" type="range" min="0" max="100" value="50" aria-label="Before and after video comparison" />
+            <button class="ba-sound" type="button" aria-pressed="false">Sound off</button>
+          </div>
+          <figcaption>Video color grading · 30 s multi-shot cut, 720p · FrameFrog look applied to the same source frames</figcaption>
+          <div class="ba-video-note">
+            <span>3D LUT · cinematic_warm</span>
+            <span>1280×720 · 23.98 fps</span>
+            <span>H.264 · faststart</span>
+            <span>AAC · stereo</span>
+          </div>
+        </figure>
       </div>
-      <div class="caption">Drag either slider — real RAW / graded color examples</div>
+      <div class="caption">Drag any slider — real RAW / graded color examples, plus the graded video</div>
     </div>
   </section>
 
@@ -713,7 +751,7 @@ python_version = "<span class="s">3.11</span>"<br/><br/>
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   document.querySelectorAll('.ba-frame').forEach(frame => {
     const range = frame.querySelector('.ba-range');
-    const after = frame.querySelector('.ba-img.after');
+    const after = frame.querySelector('.ba-img.after, .ba-vid.after');
     const divider = frame.querySelector('.divider');
     const handle = frame.querySelector('.handle');
     if(!range || !after) return;
@@ -738,6 +776,46 @@ python_version = "<span class="s">3.11</span>"<br/><br/>
     range.addEventListener('pointerup', scheduleResume);
     range.addEventListener('touchend', scheduleResume, { passive: true });
     setSplit(range.value);
+
+    // video variant: keep both clips playing and frame-synced
+    const vids = frame.querySelectorAll('.ba-vid');
+    if(vids.length){
+      const base = vids[0], over = vids[1] || null;
+      const sound = frame.querySelector('.ba-sound');
+
+      const playAll = () => {
+        vids.forEach(v => { const p = v.play(); if(p && p.catch) p.catch(() => {}); });
+      };
+
+      if(!reduceMotion){
+        playAll();
+        base.addEventListener('timeupdate', () => {
+          if(over && Math.abs(over.currentTime - base.currentTime) > 0.25){
+            try { over.currentTime = base.currentTime; } catch(e) {}
+          }
+        });
+        base.addEventListener('play', () => { if(over && over.paused) over.play().catch(() => {}); });
+        base.addEventListener('pause', () => { if(over && !over.paused) over.pause(); });
+
+        // only burn cycles while the clip is on screen
+        try {
+          new IntersectionObserver((es) => {
+            const on = es[0].isIntersecting;
+            vids.forEach(v => { if(on && v.paused) v.play().catch(() => {}); if(!on && !v.paused) v.pause(); });
+          }, { threshold: 0.2 }).observe(frame);
+        } catch(e) {}
+      }
+
+      if(sound){
+        sound.addEventListener('click', () => {
+          const on = sound.getAttribute('aria-pressed') === 'true';
+          vids.forEach(v => { v.muted = on; });
+          sound.setAttribute('aria-pressed', on ? 'false' : 'true');
+          sound.textContent = on ? 'Sound off' : 'Sound on';
+          if(!on){ playAll(); }
+        });
+      }
+    }
 
     if(reduceMotion) return;
 
