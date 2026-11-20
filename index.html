@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>FrameFrog — Serverless AI Video Post-Production Pipeline</title>
-<meta name="description" content="FrameFrog is an AI-native cloud post-production pipeline: NVDEC → DeepFilterNet → SAM 2 → 3D LUT → RIFE → Real-ESRGAN → NVENC, running on serverless GPUs with zero-copy CUDA execution." />
+<meta name="description" content="FrameFrog is an AI-native cloud post-production pipeline: NVDEC → DeepFilterNet → SAM 2 → 3D LUT → RIFE → Real-ESRGAN → NVENC, designed for serverless GPU deployment with zero-copy CUDA execution." />
 <meta name="theme-color" content="#0D1117" />
 <meta property="og:title" content="FrameFrog — AI Cloud Video Post-Production Pipeline" />
 <meta property="og:description" content="Zero-copy CUDA post-production on NVIDIA L40S/A100: neural denoise, SAM 2 mattes, 3D LUT grades, RIFE interpolation, 4K upscaling and NVENC delivery — one API call." />
@@ -347,7 +347,7 @@
       </svg>
     </div>
 
-    <span class="badge"><span class="dot"></span> Private beta · zero-copy CUDA on NVIDIA L40S / A100</span>
+    <span class="badge"><span class="dot"></span> CPU pre-MVP complete · GPU validation next</span>
     <h1>Post-production that <span class="g">edits itself</span> — in the cloud.</h1>
     <p class="lede">NVDEC → DeepFilterNet → SAM 2 → 3D LUT → RIFE → Real-ESRGAN → NVENC, in one GPU memory space.
       Neural audio cleanup, automatic mattes, AI grades, frame interpolation and 4K delivery — through a single API call.</p>
@@ -438,7 +438,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 14v-4M8 18V6M12 16V8M16 19V5M20 13v-2" stroke-linecap="round"/></svg>
           </div>
           <h3>Automated audio cleanup</h3>
-          <p>Neural denoise removes hum, hiss, and room reverb while preserving dialogue and ambience. Loudness-normalized for broadcast.</p>
+          <p>Audio cleanup adapter and loudness-processing pipeline prepared; neural runtime validation is pending.</p>
           <span class="chip">Denoise · dereverb · LUFS</span>
         </article>
 
@@ -465,8 +465,8 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 12h4l2-6 4 12 2-6h4" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
           <h3>Frame interpolation</h3>
-          <p>Motion-compensated RIFE interpolation to 60/120fps for silky slow-motion and smooth delivery — without reshoots.</p>
-          <span class="chip">RIFE · 60/120fps</span>
+          <p>Frame interpolation architecture for up to 60 FPS in the initial validation phase; higher-frame-rate processing remains on the roadmap.</p>
+          <span class="chip">RIFE · up to 60 fps</span>
         </article>
 
         <article class="card">
@@ -507,7 +507,7 @@
           <div class="flow-link" aria-hidden="true"><i class="packet" style="--d:.8s"></i></div>
           <div class="flow-node" role="listitem"><span class="n">04</span><strong>3D LUT</strong><small>Look engine</small></div>
           <div class="flow-link" aria-hidden="true"><i class="packet" style="--d:1.2s"></i></div>
-          <div class="flow-node" role="listitem"><span class="n">05</span><strong>RIFE</strong><small>60–120 fps</small></div>
+          <div class="flow-node" role="listitem"><span class="n">05</span><strong>RIFE</strong><small>up to 60 fps</small></div>
           <div class="flow-link" aria-hidden="true"><i class="packet" style="--d:1.6s"></i></div>
           <div class="flow-node" role="listitem"><span class="n">06</span><strong>Real-ESRGAN</strong><small>4K detail</small></div>
           <div class="flow-link" aria-hidden="true"><i class="packet" style="--d:2.0s"></i></div>
@@ -645,7 +645,7 @@ while True:
           <div>
             <div class="kicker" style="text-align:left">Architecture</div>
             <h2>Built on zero-copy CUDA.</h2>
-            <p>Every stage runs as a stateless GPU function. Frames stay in device memory from NVDEC to NVENC; scale to zero when idle and fan out per shot when busy.</p>
+            <p>Each stage is designed to run as a stateless cloud function, with GPU-dependent stages pending cloud validation.</p>
             <ul>
               <li>NVDEC → CUDA → TensorRT/Real-ESRGAN → NVENC, no host round-trips</li>
               <li>SAM 2 mattes, RIFE interpolation and 3D LUT grades on the same buffers</li>
